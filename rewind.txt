@@ -1,0 +1,53 @@
+def make_image():
+ml.STORE_list.append(self.scores[:], self.current_player, deepcopy(self.hiscore_evolution), deepcopy(ml.players_dict),
+                     deepcopy(ml.stats_dict), ml.x01, ml.nsets, ml.nlegs, deepcopy(ml.player_scores),
+                     deepcopy(ml.wins), ml.legs_needed, ml.active_players, deepcopy(ml.self_corr_vol), deepcopy(ml.BOT_hits))
+
+-> Aufruf immer 
+- zu Beginn eines Legs
+- Closing Procedure wenn Bot ein Match gewonnen hat
+- Closing Procedure wenn Player ein Match gewonnen hat
+- Ganz am Ende von bot_score, wenn alle Statistiken etc eingetragen sind
+- Ganz am Ende von scoring, wenn alle Statistiken etc des Players eingetragen sind
+
+def invoke_rewind():
+# Wenn ml.STORE_list mehr als einen Eintrag hat -> rewind()
+# Sonst: "No Score in memory to rewind"
+# Beim Zurückkehren von rewind() wird der "last_player" ermittelt (aus der STORE_list [-1])
+-> wenn letzter Player ein Bot war, wird NOCHMAL zurückgespult (rewind())
+-> Das ganze wird wiederholt, solange genug Einträge in STORE_list vorhanden sind; sind sie es nicht mehr, oder war last_player ein Player, dann fertig
+
+-> Aufruf immer:
+- Wenn ein Match nach Bot-Sieg nicht geschlossen werden soll
+- Wenn ein Match nach Player-Sieg nicht geschlossen werden soll
+- Wenn der User "r" tippt
+
+def rewind():
+# Letzter Player wird ermittelt (STORE_list[-2], denn "[-1]" ist current)
+# STORE_list[-1] wird an REWIND_STORE_list angehängt, per deepcopy
+# call_image mit ii=2 und direction"from STORE" setzt den Zustand des Spiels auf den letzten gespeicherten Eintrag der REWIND_STORE_list zurück
+# Es werden die damaligen "wins" mit den aktuellen verglichen um zu sehen, ob sich beim Rewind etwas am Spielstand verändert hat
+# Wenn Bots im Spiel beteiligt sind, aber der Human Player gerade ein Leg gecheckt hatte, wird BOT_hits auf leer zurückgesetzt und bot_rewind_count auf 0
+# der letzte Eintrag von STORE_list wird gelöscht
+
+def restore():
+# Wenn der jetzige Spieler ein Bot ist, wird bot_rewind_count um eins reduziert (ein Rewind ist abgegolten)
+# Das letzte Item von REWIND_STORE_list wird der STORE_list hinzugefügt, um das Restore auch wieder rückgängig machen zu können
+# Call Image wird mit ii=1 und "from REWIND" aufgerufen um das Spiel in den letzten Zustand der REWIND_list zu versetzen
+# Wenn sich etwas an den Wins geändert hat, wird der neue Spielstand angezeigt
+# Der letzte Eintrag von REWIND_STORE_list wird gelöscht
+
+- Im Gegensatz zu "rewind" wird restore nicht über eine zusätzliche "invoke"-Funktion gehandelt, sondern direkt im game_loop
+- restore() wird gerufen wenn "f" geschrieben wird und auch wirklich etwas in der REWIND_STORE_list drin ist
+- Vorher wird geprüft, wer der nächste Spieler am Zug sein wird
+- Nach vollzogenem Restore wird geprüft, ob dieser next_player ein Bot ist und falls REWIND_STORE_list noch was hergibt, wird nochmal restored (while loop)
+- Wenn beim Restore das Spiel zu Ende ist, wird der game_loop unterbrochen, damit das Spiel geschlossen werden kann
+
+
+BOT_hits: 
+- speichert die Position, die die Bots getroffen haben
+- wird mit jedem Wurf erweitert und ggf. rewinded, damit der Bot nicht neu wirft, sondern den Wurf wiederholen kann 
+- BOT_hits wird resettet, wenn der User ein Match beendet und es mit "y" auch wirklich schließt
+- BOT_hits wird resettet, wenn ein Leg rewinded wird, das ein Human gecheckt hat, weil sich sein Wurf verändert 
+
+bot_rewind_count startet mit 0 für jeden Player (auch Humans)

@@ -6,8 +6,8 @@ from math import log
 from datetime import timedelta, datetime
 import time
 
-wins = [[1,1,0], [3, 3, 0], [0, 4, 0]]
-leg_wins = [i[1] for i in wins]
-high = np.argmax(leg_wins)
+a = [[[], []] for _ in range(4)]
+myArr = np.array([1,2,3,4])
+a[0][0] = myArr
 
-print(high)
+print(a)
