@@ -200,7 +200,7 @@ class GameOn:
             else:  # 'Bot'
                 if self.bot_score() == "checkout":
                     continue_flag = False  # Kopie von Close-Procedure unten -> bessere Lösung?
-                    if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)):
+                    if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)):  #checka
                         self.make_image()  # Usually no image is created at the end of the leg, but here we need a current state to rewind
                         while True:
                             self.m.pr("***")
@@ -252,7 +252,7 @@ class GameOn:
                 game_input = int(game_input)
                 if game_input > 180 or self.scores[player] - game_input <= 1:
                     while True:
-                        answer = input("\tInvalid score of %i! Proceed anyway? y/n >>> " % game_input)
+                        answer = input("\tInvalid score of {:d}! Proceed anyway? y/n >>> ".format(game_input))
                         if answer.lower() in par.yes:
                             proceed = True
                             break
@@ -280,7 +280,7 @@ class GameOn:
                     if self.scores[player] > 170 or ndarts > 3 \
                             or not self.scores[player] in outshots.is_checkable_with_x[ndarts-1]:
                         while True:
-                            answer = input("\tInvalid checkout of score %i with %i darts. Proceed anyway? y/n >>> " % (self.scores[player], ndarts))
+                            answer = input("\tInvalid checkout of score {:d} with {:d}} darts. Proceed anyway? y/n >>> ".format(self.scores[player], ndarts))
                             if answer.lower() in par.yes:
                                 proceed = True
                                 break
@@ -292,7 +292,7 @@ class GameOn:
                     self.checkout(ndarts=ndarts)  # now proceed to checkout
 
                     continue_flag = False
-                    if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)):
+                    if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)): # checka
                         self.make_image()  # Usually no image is created at the end of the leg, but here we need a current state to rewind
                         while True:
                             self.m.pr("***")
@@ -552,7 +552,6 @@ class GameOn:
                                                         self.m.ml.players_dict[player][0],
                                                         self.scores[player]))
 
-        # self.assign_skills()
         signum = np.sign(self.skills[player]['mental'])
         if signum != 0 and self.m.ml.settings_dict['psychmod'][1] == 1 and self.m.ml.nplayers == 2:
             pressure = self.assign_pressure()  # get pressure
@@ -579,7 +578,7 @@ class GameOn:
             else:  # choose one of the options for the score!
                 n_options = len(out_dicts[ndarts][score])  # how many options for this score?
                 # get probabilities for n_options and experiment_level
-                probabilites = self.m.ml.experiment_matrix[n_options-1][self.skills[player]['exp']]
+                probabilites = self.experiment_matrix[n_options-1][self.skills[player]['exp']]
                 # draw an option according to probabilities for n_options available
                 option = np.random.choice(np.arange(start=0, stop=n_options, step=1), p=probabilites)
                 aim = out_dicts[ndarts][score][option]  # aim at that option
@@ -749,7 +748,7 @@ class GameOn:
 
         elif mode == "regular":
             score_visit = score
-            if self.scores[player] - score_visit <= 1:  # Overthrown
+            if self.scores[player] - score_visit <= 1:  # score busted
                 score_visit = 0
             else:
                 self.scores[player] -= score_visit
@@ -832,9 +831,9 @@ class GameOn:
             self.m.ml.wins[player][1] += 1  # legs in this set
             all_wins = sorted(self.m.ml.wins[pl][1] for pl in range(self.m.ml.nplayers))[::-1]
             lead = all_wins[0] - all_wins[1]  # new leading distance between leading player and follower
-            if lead == (self.m.ml.nlegs - self.m.ml.leg) or self.m.ml.leg + 1 == self.m.ml.nlegs:  # ex: nlegs 6, leg 4 (out of 5), lead: 2 -> set closed
+            if lead == (self.m.ml.nlegs - self.m.ml.leg) or self.m.ml.leg + 1 == self.m.ml.nlegs:  # ex: nlegs 6, leg 4 (out of 5), lead: 2 -> set closed  # checka
                 where = [1, 2]  # set is finished, clean set too
-                vict_player = np.argmax([i[1] for i in self.m.ml.wins])  # check who won the set (only needed for nplayers > 2)
+                vict_player = np.argmax([i[1] for i in self.m.ml.wins])  # find out who won the set (only needed for nplayers > 2)
                 self.m.ml.wins[vict_player][2] += 1
                 if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)):
                     self.m.ml.final_results = self.print_stats(which=3)
@@ -1132,7 +1131,7 @@ class MainLoop:
             self.nlegs = self.check_input("***\nNumber of legs (best of) >>> ", -1, 1001)
             if self.nlegs == -1:
                 return
-            if self.nsets > 1 and self.nlegs % 2 == 0:
+            if self.nsets > 1 and self.nplayers == 2 and self.nlegs % 2 == 0:
                 self.m.pr("Number of legs needs to be uneven number if more than 1 set is played!")
             else:
                 break
@@ -1161,9 +1160,9 @@ class MainLoop:
 
     def loop_game(self, load_paras=None):
         while not any(self.wins[i][2] == self.nsets for i in range(self.nplayers)):
-            self.legs_needed = (self.nlegs // 2) + 1
+            self.legs_needed = (self.nlegs // 2) + 1  # checka
             self.leg = 0
-            while self.leg < self.nlegs:  # catch draws
+            while self.leg < self.nlegs:  # catch draws # checka
                 self.sets_won_before = sum(self.wins[i][2] for i in range(self.nplayers))
                 self.m.new_game(load_paras)
                 load_paras = None  # override load_paras, from here on play the regular game

@@ -34,8 +34,8 @@ def calc_pressure():
     ## PRESSURE DELTA
     # Calculate pressure factors from arbitrary pressure units
     warnings.filterwarnings('ignore') # result of spline is ill-conditioned -> ignore warning
-    pressure_delta = scy_inp.spline(par.pressure_delta_x, par.pressure_delta_y,
-                                    list(range(par.n_pressure_interpolation)))
+    cs = scy_inp.CubicSpline(par.pressure_delta_x, par.pressure_delta_y)
+    pressure_delta = cs(np.arange(par.n_pressure_interpolation))
     warnings.filterwarnings('default')
 
     max_prec = np.linspace(start=par.min_pressure, stop=par.max_pressure, num=par.n_pressure_levels)

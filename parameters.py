@@ -57,5 +57,3 @@ no = ["no", "n", "nope", "false", "0", "nein", "non"]
 ## BOT SLEEP
 # How long does bot sleep when delay is TRUE?
 bot_sleep = 1.0 # seconds
-
-

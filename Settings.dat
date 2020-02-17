@@ -4,7 +4,7 @@ psychmod=Bot's realistic psychology module=1
 botrewind=Bot places new throw after rewind=-1
 matchavg=Always show match average=1
 suggest=Always show suggested scores for visit=1
-bottime=Delay bots throw (750ms)=1
+bottime=Delay bots throw (750ms)=-1
 visualize=Visualize bot throw=-1
 savstats=Save statistics for players after each leg=1
 logging=Always save match-log=-1
