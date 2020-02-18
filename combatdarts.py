@@ -200,7 +200,7 @@ class GameOn:
             else:  # 'Bot'
                 if self.bot_score() == "checkout":
                     continue_flag = False  # Kopie von Close-Procedure unten -> bessere Lösung?
-                    if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)):  #checka
+                    if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)):
                         self.make_image()  # Usually no image is created at the end of the leg, but here we need a current state to rewind
                         while True:
                             self.m.pr("***")
@@ -292,7 +292,7 @@ class GameOn:
                     self.checkout(ndarts=ndarts)  # now proceed to checkout
 
                     continue_flag = False
-                    if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)): # checka
+                    if any(self.m.ml.wins[pl][2] == self.m.ml.nsets for pl in range(self.m.ml.nplayers)):
                         self.make_image()  # Usually no image is created at the end of the leg, but here we need a current state to rewind
                         while True:
                             self.m.pr("***")
@@ -831,7 +831,9 @@ class GameOn:
             self.m.ml.wins[player][1] += 1  # legs in this set
             all_wins = sorted(self.m.ml.wins[pl][1] for pl in range(self.m.ml.nplayers))[::-1]
             lead = all_wins[0] - all_wins[1]  # new leading distance between leading player and follower
-            if lead == (self.m.ml.nlegs - self.m.ml.leg) or self.m.ml.leg + 1 == self.m.ml.nlegs:  # ex: nlegs 6, leg 4 (out of 5), lead: 2 -> set closed  # checka
+            if self.m.ml.nplayers == 2 and (lead == (self.m.ml.nlegs - self.m.ml.leg) or
+                                            self.m.ml.leg + 1 == self.m.ml.nlegs) \
+                    or self.m.ml.nplayers > 2 and any(self.m.ml.wins[pl][1] == self.m.ml.nlegs for pl in range(self.m.ml.nplayers)):
                 where = [1, 2]  # set is finished, clean set too
                 vict_player = np.argmax([i[1] for i in self.m.ml.wins])  # find out who won the set (only needed for nplayers > 2)
                 self.m.ml.wins[vict_player][2] += 1
@@ -1128,7 +1130,11 @@ class MainLoop:
         if self.nsets == -1:
             return
         while True:
-            self.nlegs = self.check_input("***\nNumber of legs (best of) >>> ", -1, 1001)
+            if self.nplayers == 2:
+                self.nlegs_condition = "best of"
+            else:
+                self.nlegs_condition = "race to"
+            self.nlegs = self.check_input("***\nNumber of legs ({}) >>> ".format(self.nlegs_condition), -1, 1001)
             if self.nlegs == -1:
                 return
             if self.nsets > 1 and self.nplayers == 2 and self.nlegs % 2 == 0:
@@ -1160,9 +1166,12 @@ class MainLoop:
 
     def loop_game(self, load_paras=None):
         while not any(self.wins[i][2] == self.nsets for i in range(self.nplayers)):
-            self.legs_needed = (self.nlegs // 2) + 1  # checka
+            if self.nplayers == 2:
+                self.legs_needed = (self.nlegs // 2) + 1
+            else:
+                self.legs_needed = self.nlegs
             self.leg = 0
-            while self.leg < self.nlegs:  # catch draws # checka
+            while self.leg < self.nlegs:  # catch draws # use different condition, depending on nplayers=2 or more
                 self.sets_won_before = sum(self.wins[i][2] for i in range(self.nplayers))
                 self.m.new_game(load_paras)
                 load_paras = None  # override load_paras, from here on play the regular game
@@ -1175,7 +1184,7 @@ class MainLoop:
             if not self.nsets == 1:
                 self.m.pr(self.set_results)
             self.set += 1
-
+            print("I happen NOW")
         # Game finished:
         if not self.autoplay:
             self.m.pr(self.final_results)

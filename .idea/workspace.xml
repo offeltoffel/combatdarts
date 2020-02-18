@@ -2,16 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d57dc136-8472-400b-a282-39a22ab6d33b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/CombatDarts.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CombatDarts.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ComplexBot22.drt" beforeDir="false" afterPath="$PROJECT_DIR$/ComplexBot22.drt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Settings.dat" beforeDir="false" afterPath="$PROJECT_DIR$/Settings.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fischi.drt" beforeDir="false" afterPath="$PROJECT_DIR$/Fischi.drt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Petely_Pete.drt" beforeDir="false" afterPath="$PROJECT_DIR$/Petely_Pete.drt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/combatdarts.py" beforeDir="false" afterPath="$PROJECT_DIR$/combatdarts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/marc.drt" beforeDir="false" afterPath="$PROJECT_DIR$/marc.drt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/offy.drt" beforeDir="false" afterPath="$PROJECT_DIR$/offy.drt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/parameters.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,7 +73,7 @@
       <recent name="E:\CombatDarts" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.combatdarts">
+  <component name="RunManager" selected="Python.Sandbox2">
     <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -394,9 +391,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Sandbox2" />
         <item itemvalue="Python.combatdarts" />
         <item itemvalue="Python.functions" />
-        <item itemvalue="Python.Sandbox2" />
         <item itemvalue="Python.parameters" />
         <item itemvalue="Python.sandbox" />
       </list>
@@ -443,22 +440,38 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="457" y="120" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1581597130710" />
-    <state width="1259" height="262" key="GridCell.Tab.0.bottom" timestamp="1581667235858">
+    <state width="1259" height="204" key="GridCell.Tab.0.bottom" timestamp="1582009013604">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="262" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1581667235858" />
-    <state width="1259" height="262" key="GridCell.Tab.0.center" timestamp="1581667235858">
+    <state width="1259" height="204" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1582009013604" />
+    <state width="1259" height="204" key="GridCell.Tab.0.center" timestamp="1582009013604">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="262" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1581667235858" />
-    <state width="1259" height="262" key="GridCell.Tab.0.left" timestamp="1581667235857">
+    <state width="1259" height="204" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1582009013604" />
+    <state width="1259" height="204" key="GridCell.Tab.0.left" timestamp="1582009013604">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="262" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1581667235857" />
-    <state width="1259" height="262" key="GridCell.Tab.0.right" timestamp="1581667235858">
+    <state width="1259" height="204" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1582009013604" />
+    <state width="1259" height="204" key="GridCell.Tab.0.right" timestamp="1582009013604">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1259" height="262" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1581667235858" />
+    <state width="1259" height="204" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1582009013604" />
+    <state width="1259" height="204" key="GridCell.Tab.1.bottom" timestamp="1582009013604">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1259" height="204" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1582009013604" />
+    <state width="1259" height="204" key="GridCell.Tab.1.center" timestamp="1582009013604">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1259" height="204" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1582009013604" />
+    <state width="1259" height="204" key="GridCell.Tab.1.left" timestamp="1582009013604">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1259" height="204" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1582009013604" />
+    <state width="1259" height="204" key="GridCell.Tab.1.right" timestamp="1582009013604">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1259" height="204" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1582009013604" />
     <state x="142" y="0" key="SettingsEditor" timestamp="1581597381090">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -466,6 +479,13 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/combatdarts.py</url>
+          <line>187</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -476,57 +496,10 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="self.m.ml.bot_rewind_count" language="Python" />
+        <watch expression="self.m.ml.wins[:][2]" language="Python" />
+        <watch expression="self.m.ml.leg" language="Python" />
+        <watch expression="self.m.ml.set" language="Python" />
       </configuration>
     </watches-manager>
-  </component>
-  <component name="debuggerHistoryManager">
-    <expressions id="watch">
-      <expression>
-        <expression-string>self.m.ml.bot_rewind_count</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>self.pressure_log</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>total_probability</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>probability_LK</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>prod_sums_log</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>self.nlegs</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>self.leg</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>self.m.ml.set</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>self.m.ml.leg</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-    </expressions>
   </component>
 </project>
