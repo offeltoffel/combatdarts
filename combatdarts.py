@@ -280,7 +280,7 @@ class GameOn:
                     if self.scores[player] > 170 or ndarts > 3 \
                             or not self.scores[player] in outshots.is_checkable_with_x[ndarts-1]:
                         while True:
-                            answer = input("\tInvalid checkout of score {:d} with {:d}} darts. Proceed anyway? y/n >>> ".format(self.scores[player], ndarts))
+                            answer = input("\tInvalid checkout of score {:d} with {:d} darts. Proceed anyway? y/n >>> ".format(self.scores[player], ndarts))
                             if answer.lower() in par.yes:
                                 proceed = True
                                 break
@@ -314,19 +314,25 @@ class GameOn:
                     self.m.ml.settings()
                     continue
 
-                elif game_input == "bot_state":  # nplayer
-                    len_passed = len(self.self_corr_vol[1])
-                    plt.plot(range(len_passed), self.self_corr_vol[1], linestyle="--", color='orange',
-                             label='Preceeding visits')
-                    plt.plot(range(len_passed, len_passed + len(self.self_corr_vol[0])), self.self_corr_vol[0],
-                             color='orange', label='Upcoming visits')
-                    plt.axvline(x=len_passed, color='black', linewidth=0.5)
-                    plt.ylabel("Precision factor")
-                    plt.xlabel("Visits")
-                    plt.legend()
-                    plt.tight_layout()
-                    plt.show()
-                    continue
+                elif game_input == "bot_state":
+                    if not self.m.ml.whos_a_bot:
+                        self.m.ml.pr("\tNo bot participating in this match!")
+                        continue
+                    else:
+                        for i_bot in self.m.ml.whos_a_bot:
+                            len_passed = len(self.self_corr_vol[i_bot][1])
+                            plt.plot(range(len_passed), self.self_corr_vol[i_bot][1], linestyle="--", color='orange',
+                                     label='Preceeding visits')
+                            plt.plot(range(len_passed, len_passed + len(self.self_corr_vol[i_bot][0])), self.self_corr_vol[i_bot][0],
+                                     color='orange', label='Upcoming visits')
+                            plt.axvline(x=len_passed, color='black', linewidth=0.5)
+                            plt.ylabel("Precision factor")
+                            plt.xlabel("Visits")
+                            plt.title("Volatile precision factors for Player {:d} ({})".format(i_bot+1, self.m.ml.players_dict[i_bot][0]))
+                            plt.legend()
+                            plt.tight_layout()
+                            plt.show()
+                            continue
 
                 elif game_input.startswith("hints"):
                     hint_split = game_input.split("#")
@@ -830,10 +836,13 @@ class GameOn:
             self.m.ml.wins[player][0] += 1  # legs total
             self.m.ml.wins[player][1] += 1  # legs in this set
             all_wins = sorted(self.m.ml.wins[pl][1] for pl in range(self.m.ml.nplayers))[::-1]
-            lead = all_wins[0] - all_wins[1]  # new leading distance between leading player and follower
+            try:
+                lead = all_wins[0] - all_wins[1]  # new leading distance between leading player and follower
+            except IndexError:  # One Player
+                lead = -1
             if self.m.ml.nplayers == 2 and (lead == (self.m.ml.nlegs - self.m.ml.leg) or
                                             self.m.ml.leg + 1 == self.m.ml.nlegs) \
-                    or self.m.ml.nplayers > 2 and any(self.m.ml.wins[pl][1] == self.m.ml.nlegs for pl in range(self.m.ml.nplayers)):
+                    or self.m.ml.nplayers != 2 and any(self.m.ml.wins[pl][1] == self.m.ml.nlegs for pl in range(self.m.ml.nplayers)):
                 where = [1, 2]  # set is finished, clean set too
                 vict_player = np.argmax([i[1] for i in self.m.ml.wins])  # find out who won the set (only needed for nplayers > 2)
                 self.m.ml.wins[vict_player][2] += 1
@@ -1113,11 +1122,15 @@ class MainLoop:
             self.m.pr("{:d}: {}".format(i+1, os.path.splitext(self.players[i])[0]))
         self.m.pr("-1: **Back to main menu**")
         players = []
-        for i in range(self.nplayers):
-            player = self.check_input("Choose Player {:d}(#) >>> ".format(i+1), -1, self.nplayers_available)
+        while len(players) < self.nplayers:
+            player = self.check_input("Choose Player {:d}(#) >>> ".format(len(players)+1), -1, self.nplayers_available)
             if player == -1:
                 return
-            players.append(player-1)
+            if player-1 in players:
+                self.m.pr("\t# Player {:d} ({}) is already selected for this match".format(player, os.path.splitext(self.players[player-1])[0]))
+                continue
+            else:
+                players.append(player-1)
 
         self.open_players(p=[self.players[player] for player in players])
         self.m.pr("***\n1: 101\n2: 201\n3: 301\n4: 401\n5: 501\n6: 601\n7: 701\n8: 801\n9: 901\n-1: **Back to main menu**")
@@ -1126,14 +1139,14 @@ class MainLoop:
             return
         self.x01 = x01*100 + 1
 
-        self.nsets = self.check_input("***\nNumber of sets (race to) >>> ", -1, 1000)
+        self.nsets = self.check_input("***\nNumber of sets (first to) >>> ", -1, 1000)
         if self.nsets == -1:
             return
         while True:
             if self.nplayers == 2:
                 self.nlegs_condition = "best of"
             else:
-                self.nlegs_condition = "race to"
+                self.nlegs_condition = "first to"
             self.nlegs = self.check_input("***\nNumber of legs ({}) >>> ".format(self.nlegs_condition), -1, 1001)
             if self.nlegs == -1:
                 return
@@ -1171,7 +1184,7 @@ class MainLoop:
             else:
                 self.legs_needed = self.nlegs
             self.leg = 0
-            while self.leg < self.nlegs:  # catch draws # use different condition, depending on nplayers=2 or more
+            while self.eval_multiplayer():  # catch draws for nplayers == 2
                 self.sets_won_before = sum(self.wins[i][2] for i in range(self.nplayers))
                 self.m.new_game(load_paras)
                 load_paras = None  # override load_paras, from here on play the regular game
@@ -1184,11 +1197,18 @@ class MainLoop:
             if not self.nsets == 1:
                 self.m.pr(self.set_results)
             self.set += 1
-            print("I happen NOW")
+
         # Game finished:
         if not self.autoplay:
             self.m.pr(self.final_results)
             self.save_stats()
+
+    def eval_multiplayer(self):
+        if self.nplayers == 2:
+            condition = self.leg < self.nlegs  # best of X legs
+        else:
+            condition = True  # first to X legs (no condition needed, no draw allowed)
+        return condition
 
     def init_autoplay(self, name, skills, bot_type):
         bot_type = str(bot_type+1)
@@ -1351,7 +1371,7 @@ class MainLoop:
                         sav_str.split("#")[2].split("-")[2]]
                 legs = [sav_str.split("#")[3].split("-")[0], sav_str.split("#")[3].split("-")[1],
                         sav_str.split("#")[3].split("-")[2]]
-                self.m.pr("\t{:02d}: {}-{}-{} {}:{}:{} ... {} vs. {}: {}-{} (sets, race to {}) & {}-{} (legs, best of {})"
+                self.m.pr("\t{:02d}: {}-{}-{} {}:{}:{} ... {} vs. {}: {}-{} (sets, first to {}) & {}-{} (legs, best of {})"
                           .format(i+1, yyyy, mm, dd, hh, minu, sec, players[0], players[1], sets[0], sets[1], sets[2],
                                   legs[0], legs[1], legs[2]))
             self.m.pr("\t -1: return")

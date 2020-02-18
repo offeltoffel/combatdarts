@@ -23,12 +23,8 @@ def save_game(ml):
     now = datetime.datetime.now()
     timestamp_str = "{:4d}{:02d}{:02d}_{:02d}-{:02d}-{:02d}".format(now.year, now.month, now.day, now.hour,
                                                                     now.minute, now.second)
-    name = "%s#%s-%s#%i-%i-%i#%i-%i-%i" % (timestamp_str, ml.players_dict[0][0], ml.players_dict[1][0],
-                                           ml.wins[0][2], ml.wins[1][2], ml.nsets, ml.wins[0][1], ml.wins[1][1],
-                                           ml.nlegs) # nplayers, noch ungeklärt: wie wird das Spiel benannt/geladen?
-    with open(name + '.sav', 'wb+') as f:
+    with open(timestamp_str + '.sav', 'wb+') as f:
         pickle.dump(save_object, f, pickle.HIGHEST_PROTOCOL)
-
 
 def calc_pressure():
     ## PRESSURE DELTA
@@ -57,7 +53,7 @@ def calc_experiment():
     experiment_matrix.append(np.exp(-np.array([1.0, 2.0, 3.0]) / m))
     experiment_matrix.append(np.exp(-np.array([1.0, 2.0, 3.0, 4.0]) / m))
 
-    for i in range(3):
+    for i in range(4):
         row_sums = experiment_matrix[i].sum(axis=1, keepdims=True)
         experiment_matrix[i] /= row_sums
 
@@ -68,7 +64,6 @@ def calc_self_cor(n, whos_a_bot):
     # Calculate self-correlations for volatility
     self_corr_vol = [[[], []] for _ in range(n)] # first item is upcoming self_corr_vol, second item is passed self_corr
     sigma_e = np.sqrt((par.self_corr_sigma ** 2) * (1 - par.self_corr ** 2))
-
 
     for i in whos_a_bot:
         normal_mean = 0
