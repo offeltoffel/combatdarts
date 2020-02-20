@@ -112,7 +112,7 @@ class GameOn:
 
         # Obtain pressure through distance between players
         if score_deltas[0] > 0:  # score_deltas[0] is current score delta. positive value: opponent leads
-            pressure_delta = self.m.ml.pressure_delta[score_deltas[0]]
+            pressure_delta = self.pressure_delta[score_deltas[0]]
         else:
             pressure_delta = 0.0
 
