@@ -1163,13 +1163,12 @@ class MainLoop:
 
     def load_new_game(self, slot):
         self.read_settings()
-        with open(self.save_slots[slot-1], 'rb') as f:
-            load_obj = pickle.load(f)
+        load_obj = load_object(load_file=self.save_slots[slot-1])
+        self.STORE_list = load_obj[:-1]   # Rewind läuft beim ersten Mal ins Leere - wird evtl zusätzlich was abgespeichert?
 
-        self.STORE_list = load_obj[:-1]  # Rewind läuft beim ersten Mal ins Leere - wird evtl zusätzlich was abgespeichert?
-
-        scores, current_player, hiscore_evolution, pl_dict_unneeded, self.stats_dict, self.x01, self.nsets, self.nlegs, \
-            self.player_scores, self.wins, self.legs_needed, self.active_players, self_corr_vol, self.BOT_hits = load_obj[-1]
+        scores, current_player, hiscore_evolution, pl_dict_unneeded, self.stats_dict, self.x01, self.nsets, \
+            self.nlegs, self.player_scores, self.wins, self.legs_needed, self.active_players, self_corr_vol, \
+            self.BOT_hits = load_obj[-1]
 
         self.nplayers = len(self.active_players)
         self.open_players(p=self.active_players)
@@ -1356,6 +1355,7 @@ class MainLoop:
         if print_slots:
             self.m.pr("List of saved matches:")
             for i in range(self.nslots):
+                load_str = ""
                 sav_str = os.path.splitext(self.save_slots[i])[0]
                 stamp_str = sav_str.split("#")[0]
                 date_str = stamp_str.split("_")[0]
@@ -1366,14 +1366,29 @@ class MainLoop:
                 hh = time_str.split("-")[0]
                 minu = time_str.split("-")[1]
                 sec = time_str.split("-")[2]
-                players = [sav_str.split("#")[1].split("-")[0], sav_str.split("#")[1].split("-")[1]]
-                sets = [sav_str.split("#")[2].split("-")[0], sav_str.split("#")[2].split("-")[1],
-                        sav_str.split("#")[2].split("-")[2]]
-                legs = [sav_str.split("#")[3].split("-")[0], sav_str.split("#")[3].split("-")[1],
-                        sav_str.split("#")[3].split("-")[2]]
-                self.m.pr("\t{:02d}: {}-{}-{} {}:{}:{} ... {} vs. {}: {}-{} (sets, first to {}) & {}-{} (legs, best of {})"
-                          .format(i+1, yyyy, mm, dd, hh, minu, sec, players[0], players[1], sets[0], sets[1], sets[2],
-                                  legs[0], legs[1], legs[2]))
+
+                load_obj = load_object(load_file=self.save_slots[i])
+                _, _, _, player_dict, _, _, nsets, nlegs, _, wins, legs_needed, _, _, _ = load_obj[-1]
+                players = [player_dict[i][0] for i in range(len(player_dict))]
+                nplayers = len(players)
+                legs_won = [wins[i][1] for i in range(nplayers)]
+                sets_won = [wins[i][2] for i in range(nplayers)]
+                if nplayers == 2:
+                    leg_mode = "best of"
+                else:
+                    leg_mode = "first to"
+
+                load_str += "\t{:02d}: {}-{}-{} {}:{}:{}".format(i + 1, yyyy, mm, dd, hh, minu, sec)
+                player_str = " ... {}".format(players[0])
+                sets_str = ": {}".format(sets_won[0])
+                legs_str = " sets (first to {:d}) & {:d}".format(nsets, legs_won[0])
+                for pl in range(1, nplayers):
+                    player_str += " vs. {}".format(players[pl])
+                    sets_str += "-{:d}".format(sets_won[pl])
+                    legs_str += "-{:d}".format(legs_won[pl])
+
+                load_str += player_str + sets_str + legs_str + " legs ({} {:d})".format(leg_mode, legs_needed)
+                self.m.pr(load_str)
             self.m.pr("\t -1: return")
 
     def load_savegame(self):

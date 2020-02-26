@@ -26,6 +26,11 @@ def save_game(ml):
     with open(timestamp_str + '.sav', 'wb+') as f:
         pickle.dump(save_object, f, pickle.HIGHEST_PROTOCOL)
 
+def load_object(load_file):
+    with open(load_file, 'rb') as f:
+        load_obj = pickle.load(f)
+    return load_obj
+
 def calc_pressure():
     ## PRESSURE DELTA
     # Calculate pressure factors from arbitrary pressure units
