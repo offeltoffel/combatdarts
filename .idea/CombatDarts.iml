@@ -4,7 +4,11 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
+<<<<<<< HEAD
     <orderEntry type="jdk" jdkName="Python 3.7 (combatdarts) (2)" jdkType="Python SDK" />
+=======
+    <orderEntry type="jdk" jdkName="Python 3.6 (CombatDarts) (1)" jdkType="Python SDK" />
+>>>>>>> 957e41d439ce0ebd89e163739fd58487fd7cf11d
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

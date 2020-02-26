@@ -42,7 +42,13 @@ class GameOn:
             self.self_corr_vol = None
             for pl in range(self.m.ml.nplayers):
                 for i in range(4):
-                    self.hiscore_evolution[pl][i].append(self.m.ml.stats_dict[pl]['HiScore'][i + 1])
+                    try:
+                        self.hiscore_evolution[pl][i].append(self.m.ml.stats_dict[pl]['HiScore'][i + 1])
+                    except IndexError:
+                        print("players: ", self.m.ml.nplayers)
+                        print("pl: ", pl)
+                        print("i: ", i)
+                        print("stop!")
 
     def calc_skills(self):
         self.vprec, self.hprec, self.boost_score, self.boost_co = calc_precisions()  # Precision for complex bot
@@ -112,7 +118,7 @@ class GameOn:
 
         # Obtain pressure through distance between players
         if score_deltas[0] > 0:  # score_deltas[0] is current score delta. positive value: opponent leads
-            pressure_delta = self.m.ml.pressure_delta[score_deltas[0]]
+            pressure_delta = self.pressure_delta[score_deltas[0]]
         else:
             pressure_delta = 0.0
 
@@ -1249,6 +1255,13 @@ class MainLoop:
         self.x01 = 501
         self.nsets = 1
         self.nlegs = 30
+        self.nplayers = 2
+        self.active_players = [-9, -99]  # Fake active players
+        self.whos_a_bot = [0, 1]
+        self.whos_a_bot_straight = [0, 1]  # e.g. [0,1] for whos_a_bot [1,4]
+        self.whos_a_human = []
+        self.BOT_hits = [[], []]  # don't care about empty lists for humans, it's easier later
+        self.bot_rewind_count = [0, 0]  # same as above
         avg_auto = list()
         corat_auto = list()
         avgco_auto = list()
@@ -1443,7 +1456,17 @@ class MainLoop:
                     file.write("%s=%s\n" % (key, str(self.stats_dict[player][key][4])))
 
     def new_player(self):
+        self.read_players()
         name = input("Name of Player\n>>> ")
+        if name in [self.players[i].split(".")[0] for i in range(self.nplayers_available)]:
+            while True:
+                check_overwrite = input("\tPlayer '{}' already exists. Overwrite? (y=yes, n=no (back to main menu) >>> ".format(name))
+                if check_overwrite.lower() in par.no:
+                    return
+                elif check_overwrite.lower() in par.yes:
+                    break
+
+        # self.m.pr("{:d}: {}".format(i + 1, os.path.splitext(self.players[i])[0]))
         player_type = self.check_input("1: Human Player; 2: Computer Player; -1: Return\n>>> ", -1, 2)
         if player_type == -1:
             return
@@ -1453,7 +1476,7 @@ class MainLoop:
             if bot_type == -1:
                 return
             if bot_type == 1:
-                skill_level = self.check_input("\tSkill level (1-50)\n>>> ", -1, 50)
+                skill_level = self.check_input("\tSkill level (1-50)\n\t>>> ", -1, 50)
                 if skill_level == -1:
                     return
                 skill_level = [skill_level for _ in range(2)]  # vprec + hprec
@@ -1462,26 +1485,26 @@ class MainLoop:
                 skill_level.append(0)  # Mental strength = 0
                 skill_level.append(10)  # Experimentation = 10
             else:
-                skill_level[0] = self.check_input("\t\tSkill level for vertical precision (distance to bull) (1 to 50)\n\t\t>>>", -1, 50)
+                skill_level[0] = self.check_input("\t\tSkill level for vertical precision (distance to bull) (1 to 50)\n\t\t>>> ", -1, 50)
                 if skill_level[0] == -1:
                     return
-                skill_level[1] = self.check_input("\t\tSkill level for azimuthal precision (angle to the sides) (1 to 50)\n\t\t>>>", -1, 50)
+                skill_level[1] = self.check_input("\t\tSkill level for azimuthal precision (angle to the sides) (1 to 50)\n\t\t>>> ", -1, 50)
                 if skill_level[1] == -1:
                     return
-                skill_level[2] = self.check_input("\t\tBot speciality (1: None, 2: Scoring, 3: Checkouts; -1: Return\n\t\t>>>", -1, 3)
+                skill_level[2] = self.check_input("\t\tBot speciality (1: None, 2: Scoring, 3: Checkouts; -1: Return\n\t\t>>> ", -1, 3)
                 if skill_level[2] == -1:
                     return
 
                 if skill_level[2] > 0:
-                    skill_level[3] = self.check_input("\t\tSpeciality skills (1 to 5)\n\t\t>>>", -1, 5)
+                    skill_level[3] = self.check_input("\t\tSpeciality skills (1 to 5)\n\t\t>>> ", -1, 5)
                     if skill_level[3] == -1:
                         return
                 else:
                     skill_level[3] = 0
-                skill_level[4] = self.check_input("\t\tMental strength (-25 to +25)\n\t\t>>>", -25, 25, False)
+                skill_level[4] = self.check_input("\t\tMental strength (-25 to +25)\n\t\t>>> ", -25, 25, False)
                 if skill_level[4] == -1:
                     return
-                skill_level[5] = self.check_input("\t\tExperience / Experimentation (1 to 50)\n\t\t>>>", -1, 50)
+                skill_level[5] = self.check_input("\t\tExperience / Experimentation (1 to 50)\n\t\t>>> ", -1, 50)
                 if skill_level[5] == -1:
                     return
             print("Please wait, while bot's strength is evaluated ... ")
@@ -1493,8 +1516,8 @@ class MainLoop:
                 elif eval_bot.lower() in par.yes:
                     break
 
-        if bot_type == 2:
-            player_type += 1  # introduce player_type = 3 for complex bot recognition
+            if bot_type == 2:
+                player_type += 1  # introduce player_type = 3 for complex bot recognition
         with open(path + "/" + name + ".drt", 'w') as file:
             file.write("name=%s\n" % name)
             file.write("type=%i\n" % player_type)

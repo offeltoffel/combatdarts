@@ -1,0 +1,16 @@
+name=FakeHuman
+type=1
+skill_level=-1,-1,-1,-1,-1,-1
+Avg=0.0
+Dtot=0
+CoAtt=0
+CoSucc=0
+CoRat=0.0
+S100+=0
+S140+=0
+S160+=0
+S180=0
+T+Out=0
+HiScore=0
+HiCo=0
+AvgCo=0.0
