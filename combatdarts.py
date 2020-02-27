@@ -4,6 +4,7 @@ import sys
 import numpy as np
 import scipy.interpolate as scy_inp
 import outshots
+import help
 import visualize_cd as vcd
 from matplotlib import pyplot as plt
 import time
@@ -40,15 +41,10 @@ class GameOn:
             self.current_player = 0
             self.hiscore_evolution = [[list(), list(), list(), list()] for _ in range(self.m.ml.nplayers)]  # [["leg, set, match, ever"] for nplayers
             self.self_corr_vol = None
-            for pl in range(self.m.ml.nplayers):
-                for i in range(4):
-                    try:
+            if not self.m.ml.autoplay:
+                for pl in range(self.m.ml.nplayers):
+                    for i in range(4):
                         self.hiscore_evolution[pl][i].append(self.m.ml.stats_dict[pl]['HiScore'][i + 1])
-                    except IndexError:
-                        print("players: ", self.m.ml.nplayers)
-                        print("pl: ", pl)
-                        print("i: ", i)
-                        print("stop!")
 
     def calc_skills(self):
         self.vprec, self.hprec, self.boost_score, self.boost_co = calc_precisions()  # Precision for complex bot
@@ -74,7 +70,7 @@ class GameOn:
 
         for pl in [i for i in range(self.m.ml.nplayers) if i in self.m.ml.whos_a_bot]:  # assign precisions for bots only
             if self.skills[pl]['special'] == 1:  # score leaning
-                special_score = self.m.ml.boost_score[self.skills[pl]['special']]
+                special_score = self.boost_score[self.skills[pl]['special']]
                 special_co = 1/special_score
             elif self.skills[pl]['special'] == 2:  # CO-leaning
                 special_co = self.boost_score[self.skills[pl]['special']]
@@ -469,6 +465,9 @@ class GameOn:
                     else:
                         continue
 
+                elif game_input == "help":
+                    self.m.pr(help.help_string)
+
                 elif game_input == "abort":
                     self.abort = True
                     break
@@ -825,7 +824,8 @@ class GameOn:
                 self.hiscore_evolution[player][i-1].append(score)  # new highscore on level, add to highscore_list
                 self.m.ml.stats_dict[player]['HiScore'][i] = score
             else:  # no new highscore on level, repeat last value
-                self.hiscore_evolution[player][i-1].append(self.hiscore_evolution[player][i-1][-1])
+                if not self.m.ml.autoplay:
+                    self.hiscore_evolution[player][i-1].append(self.hiscore_evolution[player][i-1][-1])
 
         # Printing the current stats
         if self.m.ml.settings_dict['legavg'][1] == 1:
@@ -1019,21 +1019,51 @@ class MainLoop:
 
     def reset(self, mode='all'):
         # Achtung beim Reset der Player_stats -> zu dem Zeitpunkt muss die Zahl der Player bekannt sein
-        self.stats_dict = []
         self.STORE_list = []
         self.REWIND_STORE_list = []
-        self.BOT_hits = [[]]
-        self.bot_rewind_count = []
+        self.BOT_hits = [[], []]
+        self.bot_rewind_count = [0, 0]
         if mode == 'all':  # this is skipped for autoplay
+            self.stats_dict = []
             self.players = list()
             self.nplayers_available = None
             self.players_dict = None
             self.whos_a_bot = []
             self.whos_a_human = []
             self.settings_dict = None
+        elif mode == 'soft':
+            self.statsdict_autoplay()
 
         self.final_results = None
         self.set_results = None
+
+    def statsdict_autoplay(self):
+        self.stats_dict = {0: {'Avg': [['Avg', 'fl'], 0, 0, 0, 0.0],
+                               'Dtot': [['Darts in total', 'int'], 0, 0, 0, 0],
+                               'CoAtt': [['Checkout - attempts', 'int'], 0, 0, 0, 0],
+                               'CoSucc': [['Checkout - successfull', 'int'], 0, 0, 0, 0],
+                               'CoRat': [['Checkout - percentage', 'fl'], 0, 0, 0, 0.0],
+                               'S100+': [['Score 100+', 'int'], 0, 0, 0, 0],
+                               'S140+': [['Score 140+', 'int'], 0, 0, 0, 0],
+                               'S160+': [['Score 160+', 'int'], 0, 0, 0, 0],
+                               'S180': [['Score 180+', 'int'], 0, 0, 0, 0],
+                               'T+Out': [['Outshots 100+', 'int'], 0, 0, 0, 0],
+                               'HiScore': [['Highest Score', 'int'], 0, 0, 0, 120],
+                               'HiCo': [['Highest Checkout', 'int'], 0, 0, 0, 0],
+                               'AvgCo': [['Average Checkout', 'fl'], 0, 0, 0, 0.0]},
+                           1: {'Avg': [['Avg', 'fl'], 0, 0, 0, 0.0],
+                               'Dtot': [['Darts in total', 'int'], 0, 0, 0, 0],
+                               'CoAtt': [['Checkout - attempts', 'int'], 0, 0, 0, 0],
+                               'CoSucc': [['Checkout - successfull', 'int'], 0, 0, 0, 0],
+                               'CoRat': [['Checkout - percentage', 'fl'], 0, 0, 0, 0.0],
+                               'S100+': [['Score 100+', 'int'], 0, 0, 0, 0],
+                               'S140+': [['Score 140+', 'int'], 0, 0, 0, 0],
+                               'S160+': [['Score 160+', 'int'], 0, 0, 0, 0],
+                               'S180': [['Score 180+', 'int'], 0, 0, 0, 0],
+                               'T+Out': [['Outshots 100+', 'int'], 0, 0, 0, 0],
+                               'HiScore': [['Highest Score', 'int'], 0, 0, 0, 120],
+                               'HiCo': [['Highest Checkout', 'int'], 0, 0, 0, 0],
+                               'AvgCo': [['Average Checkout', 'fl'], 0, 0, 0, 0.0]}}
 
     def reset_player_stats(self):
         player_stats = {'Avg': [['Avg', 'fl'], 0, 0, 0, 0],
@@ -1226,32 +1256,7 @@ class MainLoop:
                              1: [name, bot_type, skills]}
         # self.players_dict = {0: ["", "3", "20, 16, 3, 2, 8, 18"],
         #                      1: ["", "3", "20, 16, 3, 2, 8, 18"]}
-        self.stats_dict = {0: {'Avg': [['Avg', 'fl'], 0, 0, 0, 0.0],
-                               'Dtot': [['Darts in total', 'int'], 0, 0, 0, 0],
-                               'CoAtt': [['Checkout - attempts', 'int'], 0, 0, 0, 0],
-                               'CoSucc': [['Checkout - successfull', 'int'], 0, 0, 0, 0],
-                               'CoRat': [['Checkout - percentage', 'fl'], 0, 0, 0, 0.0],
-                               'S100+': [['Score 100+', 'int'], 0, 0, 0, 0],
-                               'S140+': [['Score 140+', 'int'], 0, 0, 0, 0],
-                               'S160+': [['Score 160+', 'int'], 0, 0, 0, 0],
-                               'S180': [['Score 180+', 'int'], 0, 0, 0, 0],
-                               'T+Out': [['Outshots 100+', 'int'], 0, 0, 0, 0],
-                               'HiScore': [['Highest Score', 'int'], 0, 0, 0, 120],
-                               'HiCo': [['Highest Checkout', 'int'], 0, 0, 0, 0],
-                               'AvgCo': [['Average Checkout', 'fl'], 0, 0, 0, 0.0]},
-                           1: {'Avg': [['Avg', 'fl'], 0, 0, 0, 0.0],
-                               'Dtot': [['Darts in total', 'int'], 0, 0, 0, 0],
-                               'CoAtt': [['Checkout - attempts', 'int'], 0, 0, 0, 0],
-                               'CoSucc': [['Checkout - successfull', 'int'], 0, 0, 0, 0],
-                               'CoRat': [['Checkout - percentage', 'fl'], 0, 0, 0, 0.0],
-                               'S100+': [['Score 100+', 'int'], 0, 0, 0, 0],
-                               'S140+': [['Score 140+', 'int'], 0, 0, 0, 0],
-                               'S160+': [['Score 160+', 'int'], 0, 0, 0, 0],
-                               'S180': [['Score 180+', 'int'], 0, 0, 0, 0],
-                               'T+Out': [['Outshots 100+', 'int'], 0, 0, 0, 0],
-                               'HiScore': [['Highest Score', 'int'], 0, 0, 0, 120],
-                               'HiCo': [['Highest Checkout', 'int'], 0, 0, 0, 0],
-                               'AvgCo': [['Average Checkout', 'fl'], 0, 0, 0, 0.0]}}
+        self.statsdict_autoplay()  # creates empty stats_dict for autoplay
         self.x01 = 501
         self.nsets = 1
         self.nlegs = 30
@@ -1265,17 +1270,17 @@ class MainLoop:
         avg_auto = list()
         corat_auto = list()
         avgco_auto = list()
-        for i_match in range(20):
+        for i_match in range(10):
             # initialize lists
             self.player_scores = [[[], [], []], [[], [], []]]
             self.wins = [[0, 0, 0], [0, 0, 0]]  # wins[player][legs_total, legs, sets]
             self.set = 0
             self.loop_game()
-            sys.stdout.write("\rEvaluating ... {:d}%".format((i_match+1)*5))
+            sys.stdout.write("\rEvaluating ... {:d}%".format((i_match+1)*10))
             sys.stdout.flush()
-            avg_auto.append(self.m.ml.stats_dict[0]['Avg'][3])
-            corat_auto.append(self.m.ml.stats_dict[0]['CoRat'][3])
-            avgco_auto.append(self.m.ml.stats_dict[0]['AvgCo'][3])
+            avg_auto.append(np.mean((self.m.ml.stats_dict[0]['Avg'][3], self.m.ml.stats_dict[1]['Avg'][3])))
+            corat_auto.append(np.mean((self.m.ml.stats_dict[0]['CoRat'][3], self.m.ml.stats_dict[1]['CoRat'][3])))
+            avgco_auto.append(np.mean((self.m.ml.stats_dict[0]['AvgCo'][3], self.m.ml.stats_dict[1]['AvgCo'][3])))
             self.reset(mode='soft')  # soft reset skips player and settings reset (but resets statistics)
         self.autoplay = False
         self.m.pr("\n# Bot's Average: {:5.2f}\n# Bot's Checkout-rate: {:4.2f}\n# Bot's Average Checkout: {:5.2f}\n##"
@@ -1495,7 +1500,7 @@ class MainLoop:
                 if skill_level[2] == -1:
                     return
 
-                if skill_level[2] > 0:
+                if skill_level[2] > 1:
                     skill_level[3] = self.check_input("\t\tSpeciality skills (1 to 5)\n\t\t>>> ", -1, 5)
                     if skill_level[3] == -1:
                         return

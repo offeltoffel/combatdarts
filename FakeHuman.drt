@@ -1,6 +1,6 @@
 name=FakeHuman
-type=1
-skill_level=-1,-1,-1,-1,-1,-1
+type=3
+skill_level=40,40,2,4,20,40
 Avg=0.0
 Dtot=0
 CoAtt=0
