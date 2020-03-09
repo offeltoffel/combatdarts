@@ -337,7 +337,7 @@ class GameOn:
                             continue
 
                 elif game_input.startswith("hints"):
-                    hint_split = game_input.split("#")
+                    hint_split = game_input.split("/")
                     if len(hint_split) == 1:
                         self.all_suggestions(score=self.scores[player], ndarts=3)
                     else:
@@ -366,33 +366,41 @@ class GameOn:
                     continue
 
                 elif game_input.startswith("stats"):
-                    add = game_input[5:]
-                    which = None
-                    who = None
-                    if not add == "":
+                    who_flag = False
+                    stats_split = game_input.split("/")
+                    if len(stats_split) == 1:  # "stats"
+                        which = None
+                        who = None
+                    else:  # len(stats_split) > 1
                         try:
-                            who = int(add)
-                        except ValueError:
-                            if add.startswith('l'):
-                                which = 1
-                            elif add.startswith('s'):
-                                which = 2
-                            elif add.startswith('m'):
-                                which = 3
-                            else:
-                                self.m.pr("#!# Try 'stats' with 'l' (leg), 's' (set) or 'm' (match) + player number")
+                            who = int(stats_split[1])
+                            if who - 1 in range(self.m.ml.nplayers) and len(stats_split) == 2:
+                                self.m.pr(self.print_stats(which=None, who=who))  # "stats/#"
                                 continue
-
-                        if not who:
-                            if add[1:] == "":
-                                who = None
                             else:
-                                try:
-                                    who = int(add[1:])
-                                except ValueError:
-                                    self.m.pr(
-                                        "#!# Try 'stats' with 'l' (leg), 's' (set) or 'm' (match) + player number")
-                                    continue
+                                self.m.pr("\tInvalid player number {}! Allowed options: [{}]".format(
+                                    game_input[6:], ", ".join(str(i + 1) for i in range(self.m.ml.nplayers))))
+                                continue
+                        except ValueError:
+                            if not stats_split[1].lower() in ["l", "s", "m", "leg", "set", "match"]:
+                                self.m.pr("\t Invalid input! Try 'stats/x' with x either 'l' (leg), 's' (set) or 'm' (match) or player number")
+                                continue
+                            else:
+                                which = get_which_stats(which=stats_split[1].lower())
+
+                        if len(stats_split) > 2:
+                            try:
+                                who = int(stats_split[2])
+                                if not who-1 in range(self.m.ml.nplayers):
+                                    who_flag = True
+                                    who = str(who)
+                            except ValueError:
+                                who_flag = True
+
+                            if who_flag:
+                                self.m.pr("\tInvalid player number {}! Allowed options: [{}]".format(
+                                    stats_split[2], ", ".join(str(i+1) for i in range(self.m.ml.nplayers))))
+                                continue
 
                     self.m.pr(self.print_stats(which=which, who=who))
                     continue
@@ -1079,7 +1087,9 @@ class MainLoop:
                         'HiScore': [['Highest Score', 'int'], 0, 0, 0, 0],
                         'HiCo': [['Highest Checkout', 'int'], 0, 0, 0, 0],
                         'AvgCo': [['Average Checkout', 'fl'], 0, 0, 0, 0]}
+
         self.stats_dict = [deepcopy(player_stats) for _ in range(self.nplayers)]  # nplayers
+
 
     def global_statistics(self):
         self.read_players()
@@ -1090,7 +1100,8 @@ class MainLoop:
         player = self.check_input("choose Player (#) >>> ", -1, self.nplayers_available)
         if player == -1:
             return
-        self.open_players(p=[self.players[player]])
+        self.nplayers = 1
+        self.open_players(p=[self.players[player-1]])
 
         self.m.pr("\n\n#### STATISTICS ####\n")
         self.m.pr("Name of Player: {}".format(self.players_dict[0][0]))
@@ -1114,7 +1125,7 @@ class MainLoop:
                 skill = skillz[0]
                 self.m.pr("Skill level (1-50): {:d}".format(skill))
             else:
-                self.m.pr("Skill level for vertical precision (distance to bull) (1 to 50): {:d}"
+                self.m.pr("Skill level for radial precision (distance to bull) (1 to 50): {:d}"
                           .format(skillz[0]))
                 self.m.pr("Skill level for azimuthal precision (angle to the sides) (1 to 50): {:d}"
                           .format(skillz[1]))
@@ -1144,9 +1155,9 @@ class MainLoop:
         self.m.pr("Tons Out (100+): {:d}".format(self.stats_dict[0]['T+Out'][-1]))
         self.m.pr("Highest Score ever: {:d}".format(self.stats_dict[0]['HiScore'][-1]))
         self.m.pr("Highest Checkout ever: {:d}".format(self.stats_dict[0]['HiCo'][-1]))
-        self.m.pr("Average Checkout: {:4.2f}\n\n".format(self.stats_dict[0]['AvgCo'][-1]))
+        self.m.pr("Average Checkout: {:4.2f}\n".format(self.stats_dict[0]['AvgCo'][-1]))
         self.reset()
-        return
+        input("Press ENTER to continue ...")
 
     def new_game(self):
         self.read_settings()
@@ -1290,6 +1301,7 @@ class MainLoop:
         while True:
             self.reset()
             self.read_settings()
+            self.m.pr(help.welcome_string)
             self.m.pr("***\n1: new game\n2: load savegame\n3: new player\n4: statistics\n5: settings\n-1: exit")
             user_in = self.check_input(">>> ", -1, 6)
 
@@ -1451,6 +1463,7 @@ class MainLoop:
         self.BOT_hits = [[] for _ in range(self.nplayers)]  # don't care about empty lists for humans, it's easier later
         self.bot_rewind_count = [0 for _ in range(self.nplayers)]  # same as above
 
+
     def save_stats(self):
         for player in range(self.nplayers):
             with open(path+"/"+self.players_dict[player][0]+'.drt', 'w') as file:
@@ -1490,7 +1503,7 @@ class MainLoop:
                 skill_level.append(0)  # Mental strength = 0
                 skill_level.append(10)  # Experimentation = 10
             else:
-                skill_level[0] = self.check_input("\t\tSkill level for vertical precision (distance to bull) (1 to 50)\n\t\t>>> ", -1, 50)
+                skill_level[0] = self.check_input("\t\tSkill level for radial precision (distance to bull) (1 to 50)\n\t\t>>> ", -1, 50)
                 if skill_level[0] == -1:
                     return
                 skill_level[1] = self.check_input("\t\tSkill level for azimuthal precision (angle to the sides) (1 to 50)\n\t\t>>> ", -1, 50)

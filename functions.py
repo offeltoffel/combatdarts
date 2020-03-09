@@ -103,3 +103,13 @@ def score_from_field(hit_str):
     num = int(hit_str[1:])
     factor = outshots.field_factors[field]
     return factor * num
+
+def get_which_stats(which):
+    if which.startswith("l"):
+        return 1
+    elif which.startswith("s"):
+        return 2
+    elif which.startswith("m"):
+        return 3
+    else:
+        return None

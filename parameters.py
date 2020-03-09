@@ -2,7 +2,6 @@
 
 import numpy as np
 
-
 ######## Careful changing of the parameters!
 
 ## PRECISION

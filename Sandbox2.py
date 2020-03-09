@@ -5,14 +5,7 @@ from math import log
 from datetime import timedelta, datetime
 import time
 
-blub = list()
+nplayers = 3
 
-for i in range(3):
-    bla = int(input("Number >> "))
-    if bla > 5:
-        i -= 1
-        continue
-    else:
-        blub.append(bla)
-
-print(blub)
+mystr = ", ".join(str(i+1) for i in range(nplayers))
+print(mystr)
